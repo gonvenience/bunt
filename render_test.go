@@ -31,11 +31,11 @@ import (
 
 var _ = Describe("render colored strings", func() {
 	Context("verify that rendering of colored strings returns correct results", func() {
-		BeforeEach(func(){
+		BeforeEach(func() {
 			ColorSetting = ON
 			TrueColorSetting = ON
 		})
-		
+
 		AfterEach(func() {
 			ColorSetting = AUTO
 			TrueColorSetting = AUTO
@@ -52,7 +52,7 @@ var _ = Describe("render colored strings", func() {
 
 		It("should render plain output when colors are not enabled", func() {
 			ColorSetting = OFF
-			
+
 			input := "Example: \x1b[1mbold\x1b[0m, \x1b[3mitalic\x1b[0m, \x1b[4munderline\x1b[0m, \x1b[38;2;133;247;7mforeground\x1b[0m, and \x1b[48;2;133;247;7mbackground\x1b[0m."
 			result, err := ParseString(input)
 			Expect(err).ToNot(HaveOccurred())
