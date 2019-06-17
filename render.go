@@ -44,7 +44,7 @@ func (s String) String() string {
 			current = coloredRune.Settings
 		}
 
-		buffer.WriteRune(coloredRune.Symbol)
+		buffer.WriteByte(byte(coloredRune.Symbol))
 	}
 
 	// Make sure to finish with a reset escape sequence

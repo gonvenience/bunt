@@ -47,10 +47,10 @@ var (
 // SGR details : https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
 func ParseString(input string) (*String, error) {
 	var (
-		pointer = 0
-		current = uint64(0)
-		result  = String{}
-		err     = error(nil)
+		pointer int
+		current uint64
+		result  String
+		err     error
 	)
 
 	// Special case: the escape sequence without any parameter is equivalent to
@@ -79,7 +79,7 @@ func ParseString(input string) (*String, error) {
 	}
 
 	if ProcessMarkdownStyleTextAnnotations {
-		if err := processMarkdownStyleTextAnnotations(&result); err != nil {
+		if err = processMarkdownStyleTextAnnotations(&result); err != nil {
 			return nil, err
 		}
 	}
@@ -139,7 +139,7 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 func processMarkdownStyleTextAnnotations(text *String) error {
 	var buffer bytes.Buffer
 	for _, coloredRune := range *text {
-		buffer.WriteRune(coloredRune.Symbol)
+		buffer.WriteByte(byte(coloredRune.Symbol))
 	}
 
 	raw := buffer.String()

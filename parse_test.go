@@ -28,15 +28,17 @@ import (
 )
 
 var _ = Describe("parse input string", func() {
+	BeforeEach(func() {
+		ColorSetting = ON
+		TrueColorSetting = ON
+	})
+
+	AfterEach(func() {
+		ColorSetting = AUTO
+		TrueColorSetting = AUTO
+	})
+
 	Context("parse Select Graphic Rendition (SGR) based input", func() {
-		BeforeEach(func() {
-			ColorSetting = ON
-		})
-
-		AfterEach(func() {
-			ColorSetting = AUTO
-		})
-
 		It("should parse an input string with SGR parameters", func() {
 			input := "Example: \x1b[1mbold\x1b[0m, \x1b[3mitalic\x1b[0m, \x1b[4munderline\x1b[0m, \x1b[38;2;133;247;7mforeground\x1b[0m, and \x1b[48;2;133;247;7mbackground\x1b[0m."
 			result, err := ParseString(input)
@@ -123,14 +125,6 @@ var _ = Describe("parse input string", func() {
 	})
 
 	Context("parse markdown style text annotations", func() {
-		BeforeEach(func() {
-			ColorSetting = ON
-		})
-
-		AfterEach(func() {
-			ColorSetting = AUTO
-		})
-
 		It("should parse an input string with markdown style text annotations", func() {
 			input := "Example: *bold*, _italic_, ~underline~, and CornflowerBlue{foreground}."
 			result, err := ParseString(input)
@@ -194,6 +188,16 @@ var _ = Describe("parse input string", func() {
 			result, err := ParseString(input)
 			Expect(err).To(HaveOccurred())
 			Expect(result).To(BeNil())
+		})
+	})
+
+	Context("parse input string with multi-byte characters", func() {
+		It("should correctly parse multi-byte character strings", func() {
+			result, err := ParseString("Gray{Debug➤ Found asset file} White{X} with permission White{Y}")
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeNil())
+			Expect(result.String()).To(
+				BeEquivalentTo("\x1b[38;2;128;128;128mDebug➤ Found asset file\x1b[0m \x1b[38;2;255;255;255mX\x1b[0m with permission \x1b[38;2;255;255;255mY\x1b[0m"))
 		})
 	})
 })
