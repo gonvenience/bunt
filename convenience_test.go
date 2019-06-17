@@ -54,6 +54,10 @@ var _ = Describe("convenience functions", func() {
 		It("should return the right size when used on strings created by the bunt package", func() {
 			Expect(PlainTextLength(Sprintf("*This* text is too long"))).To(BeEquivalentTo(len(Sprintf("This text is too long"))))
 		})
+
+		It("should return the correct length based on the rune count", func() {
+			Expect(PlainTextLength("fünf")).To(BeEquivalentTo(4))
+		})
 	})
 
 	Context("style function", func() {

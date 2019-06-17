@@ -20,20 +20,35 @@
 
 package bunt
 
-import colorful "github.com/lucasb-eyer/go-colorful"
+import (
+	"regexp"
+	"strings"
+	"unicode/utf8"
+
+	colorful "github.com/lucasb-eyer/go-colorful"
+)
 
 // StyleOption defines style option for strings
 type StyleOption func(*String)
 
 // PlainTextLength returns the length of the input text without any escape
-// sequences. The function will panic in the unlikely case of a parse issue.
+// sequences.
 func PlainTextLength(text string) int {
-	result, err := ParseString(text)
-	if err != nil {
-		panic(err)
+	return utf8.RuneCountInString(RemoveAllEscapeSequences(text))
+}
+
+// RemoveAllEscapeSequences return the input string with all escape sequences
+// removed.
+func RemoveAllEscapeSequences(input string) string {
+	escapeSeqFinderRegExp := regexp.MustCompile(`\x1b\[([\d;]*)m`)
+
+	for loc := escapeSeqFinderRegExp.FindStringIndex(input); loc != nil; loc = escapeSeqFinderRegExp.FindStringIndex(input) {
+		start := loc[0]
+		end := loc[1]
+		input = strings.Replace(input, input[start:end], "", -1)
 	}
 
-	return len(*result)
+	return input
 }
 
 // Substring returns a substring of a text that may contains escape sequences.
