@@ -37,12 +37,12 @@ func evaluateInputs(in ...interface{}) []interface{} {
 	return result
 }
 
-func evaluateString(in string) string {
-	if result, err := ParseString(in); err == nil {
+func evaluateString(input string) string {
+	if result, err := ParseString(input, ProcessTextAnnotations()); err == nil {
 		return result.String()
 	}
 
-	return in
+	return input
 }
 
 // Print wraps fmt.Print(a ...interface{}) and evaluates any text markers into its respective format

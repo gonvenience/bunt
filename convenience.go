@@ -95,6 +95,13 @@ func Foreground(color colorful.Color) StyleOption {
 	}
 }
 
+// EnableTextAnnotations enables post-processing to evaluate text annotations
+func EnableTextAnnotations() StyleOption {
+	return func(s *String) {
+		processTextAnnotations(s)
+	}
+}
+
 // Style is a multi-purpose function to programmatically apply styles and other
 // changes to an input text. The function will panic in the unlikely case of a
 // parse issue.

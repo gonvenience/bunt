@@ -29,10 +29,6 @@ import (
 	"strings"
 )
 
-// ProcessMarkdownStyleTextAnnotations specifies whether Mardown style text
-// annotations like *bold*, or _italic_ should be processed during parsing.
-var ProcessMarkdownStyleTextAnnotations = true
-
 var (
 	escapeSeqRegExp = regexp.MustCompile(`\x1b\[(\d+(;\d+)*)m`)
 	boldMarker      = regexp.MustCompile(`\*([^*]+?)\*`)
@@ -41,11 +37,22 @@ var (
 	colorMarker     = regexp.MustCompile(`(\w+)\{([^}]+?)\}`)
 )
 
+// ParseOption defines parser options
+type ParseOption func(*String) error
+
+// ProcessTextAnnotations specifies whether during parsing bunt-specific text
+// annotations like *bold*, or _italic_ should be processed.
+func ProcessTextAnnotations() ParseOption {
+	return func(s *String) error {
+		return processTextAnnotations(s)
+	}
+}
+
 // ParseString parses a string that can contain both ANSI escape code Select
 // Graphic Rendition (SGR) codes and Markdown style text annotations, for
 // example *bold* or _italic_.
 // SGR details : https://en.wikipedia.org/wiki/ANSI_escape_code#SGR_parameters
-func ParseString(input string) (*String, error) {
+func ParseString(input string, opts ...ParseOption) (*String, error) {
 	var (
 		pointer int
 		current uint64
@@ -78,8 +85,9 @@ func ParseString(input string) (*String, error) {
 		result = append(result, ColoredRune{rune(input[i]), current})
 	}
 
-	if ProcessMarkdownStyleTextAnnotations {
-		if err = processMarkdownStyleTextAnnotations(&result); err != nil {
+	// Process optional parser options
+	for _, opt := range opts {
+		if err = opt(&result); err != nil {
 			return nil, err
 		}
 	}
@@ -136,7 +144,7 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 	return result, nil
 }
 
-func processMarkdownStyleTextAnnotations(text *String) error {
+func processTextAnnotations(text *String) error {
 	var buffer bytes.Buffer
 	for _, coloredRune := range *text {
 		buffer.WriteByte(byte(coloredRune.Symbol))
