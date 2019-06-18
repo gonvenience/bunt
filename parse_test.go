@@ -127,7 +127,7 @@ var _ = Describe("parse input string", func() {
 	Context("parse markdown style text annotations", func() {
 		It("should parse an input string with markdown style text annotations", func() {
 			input := "Example: *bold*, _italic_, ~underline~, and CornflowerBlue{foreground}."
-			result, err := ParseString(input)
+			result, err := ParseString(input, ProcessTextAnnotations())
 			Expect(err).ToNot(HaveOccurred())
 			Expect(*result).To(
 				BeEquivalentTo(String([]ColoredRune{
@@ -185,7 +185,7 @@ var _ = Describe("parse input string", func() {
 
 		It("should bail out nicely in case of invalid color name", func() {
 			input := "Invalid: InvalidColor{foobar}."
-			result, err := ParseString(input)
+			result, err := ParseString(input, ProcessTextAnnotations())
 			Expect(err).To(HaveOccurred())
 			Expect(result).To(BeNil())
 		})
@@ -193,7 +193,8 @@ var _ = Describe("parse input string", func() {
 
 	Context("parse input string with multi-byte characters", func() {
 		It("should correctly parse multi-byte character strings", func() {
-			result, err := ParseString("Gray{Debug➤ Found asset file} White{X} with permission White{Y}")
+			input := "Gray{Debug➤ Found asset file} White{X} with permission White{Y}"
+			result, err := ParseString(input, ProcessTextAnnotations())
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result).ToNot(BeNil())
 			Expect(result.String()).To(

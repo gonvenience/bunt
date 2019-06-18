@@ -75,7 +75,8 @@ var _ = Describe("render colored strings", func() {
 
 		var (
 			f1 = func(color string) string {
-				result, err := ParseString(fmt.Sprintf("%s{%s}", color, "text"))
+				input := fmt.Sprintf("%s{%s}", color, "text")
+				result, err := ParseString(input, ProcessTextAnnotations())
 				Expect(err).ToNot(HaveOccurred())
 				Expect(result).ToNot(BeNil())
 				return result.String()

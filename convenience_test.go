@@ -80,5 +80,15 @@ var _ = Describe("convenience functions", func() {
 			Expect(Style("text", Bold(), Foreground(CornflowerBlue))).To(
 				BeEquivalentTo("\x1b[1;38;2;100;149;237mtext\x1b[0m"))
 		})
+
+		It("should not evaluate special text annotations by default", func() {
+			Expect(Style("_text_", Foreground(YellowGreen))).To(
+				BeEquivalentTo("\x1b[38;2;154;205;50m_text_\x1b[0m"))
+		})
+
+		It("should evaluate special text annotations if enabled", func() {
+			Expect(Style("_text_", Foreground(YellowGreen), EnableTextAnnotations())).To(
+				BeEquivalentTo("\x1b[3;38;2;154;205;50mtext\x1b[0m"))
+		})
 	})
 })
