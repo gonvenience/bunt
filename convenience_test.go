@@ -104,5 +104,25 @@ var _ = Describe("convenience functions", func() {
 			Expect(Style("text\ntext", Foreground(Yellow), EachLine())).To(
 				BeEquivalentTo("\x1b[38;2;255;255;0mtext\ntext\x1b[0m"))
 		})
+
+		It("should support text emphasis both line by line as well as full block mode", func() {
+			Expect(Style("text\ntext", Bold())).To(
+				BeEquivalentTo("\x1b[1mtext\ntext\x1b[0m"))
+
+			Expect(Style("text\ntext", Italic())).To(
+				BeEquivalentTo("\x1b[3mtext\ntext\x1b[0m"))
+
+			Expect(Style("text\ntext", Underline())).To(
+				BeEquivalentTo("\x1b[4mtext\ntext\x1b[0m"))
+
+			Expect(Style("text\ntext", EachLine(), Bold())).To(
+				BeEquivalentTo("\x1b[1mtext\x1b[0m\n\x1b[1mtext\x1b[0m"))
+
+			Expect(Style("text\ntext", EachLine(), Italic())).To(
+				BeEquivalentTo("\x1b[3mtext\x1b[0m\n\x1b[3mtext\x1b[0m"))
+
+			Expect(Style("text\ntext", EachLine(), Underline())).To(
+				BeEquivalentTo("\x1b[4mtext\x1b[0m\n\x1b[4mtext\x1b[0m"))
+		})
 	})
 })
