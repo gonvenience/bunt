@@ -90,5 +90,19 @@ var _ = Describe("convenience functions", func() {
 			Expect(Style("_text_", Foreground(YellowGreen), EnableTextAnnotations())).To(
 				BeEquivalentTo("\x1b[3;38;2;154;205;50mtext\x1b[0m"))
 		})
+
+		It("should support both line by line coloring as well as full block coloring", func() {
+			// By default, color the whole string including new line sequences
+			Expect(Style("text\ntext", Foreground(Yellow))).To(
+				BeEquivalentTo("\x1b[38;2;255;255;0mtext\ntext\x1b[0m"))
+
+			// If EachLine is enabled before coloring, ignore new line sequences
+			Expect(Style("text\ntext", EachLine(), Foreground(Yellow))).To(
+				BeEquivalentTo("\x1b[38;2;255;255;0mtext\x1b[0m\n\x1b[38;2;255;255;0mtext\x1b[0m"))
+
+			// If EachLine is enabled after coloring, it has no effect
+			Expect(Style("text\ntext", Foreground(Yellow), EachLine())).To(
+				BeEquivalentTo("\x1b[38;2;255;255;0mtext\ntext\x1b[0m"))
+		})
 	})
 })
