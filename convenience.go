@@ -28,8 +28,11 @@ import (
 	colorful "github.com/lucasb-eyer/go-colorful"
 )
 
-// StyleOption defines style option for strings
-type StyleOption func(*String)
+// StyleOption defines style option for colored strings
+type StyleOption struct {
+	flags       []string
+	postProcess func(*String, map[string]struct{})
+}
 
 // PlainTextLength returns the length of the input text without any escape
 // sequences.
@@ -66,39 +69,61 @@ func Substring(text string, start int, end int) string {
 
 // Bold applies the bold text parameter
 func Bold() StyleOption {
-	return func(s *String) {
-		for i := range *s {
-			(*s)[i].Settings |= 1 << 2
-		}
+	return StyleOption{
+		postProcess: func(s *String, flags map[string]struct{}) {
+			for i := range *s {
+				(*s)[i].Settings |= 1 << 2
+			}
+		},
 	}
 }
 
 // Italic applies the italic text parameter
 func Italic() StyleOption {
-	return func(s *String) {
-		for i := range *s {
-			(*s)[i].Settings |= 1 << 3
-		}
+	return StyleOption{
+		postProcess: func(s *String, flags map[string]struct{}) {
+			for i := range *s {
+				(*s)[i].Settings |= 1 << 3
+			}
+		},
 	}
 }
 
 // Foreground sets the given color as the foreground color of the text
 func Foreground(color colorful.Color) StyleOption {
-	r, g, b := color.RGB255()
-	return func(s *String) {
-		for i := range *s {
-			(*s)[i].Settings |= 1
-			(*s)[i].Settings |= uint64(r) << 8
-			(*s)[i].Settings |= uint64(g) << 16
-			(*s)[i].Settings |= uint64(b) << 24
-		}
+	return StyleOption{
+		postProcess: func(s *String, flags map[string]struct{}) {
+			r, g, b := color.RGB255()
+			_, skipNewLine := flags["skipNewLine"]
+
+			for i := range *s {
+				if skipNewLine && (*s)[i].Symbol == '\n' {
+					continue
+				}
+
+				(*s)[i].Settings |= 1
+				(*s)[i].Settings |= uint64(r) << 8
+				(*s)[i].Settings |= uint64(g) << 16
+				(*s)[i].Settings |= uint64(b) << 24
+			}
+		},
 	}
 }
 
 // EnableTextAnnotations enables post-processing to evaluate text annotations
 func EnableTextAnnotations() StyleOption {
-	return func(s *String) {
-		processTextAnnotations(s)
+	return StyleOption{
+		postProcess: func(s *String, flags map[string]struct{}) {
+			processTextAnnotations(s)
+		},
+	}
+}
+
+// EachLine enables that new line sequences will be ignored during coloring,
+// which will lead to strings that are colored line by line and not as a block.
+func EachLine() StyleOption {
+	return StyleOption{
+		flags: []string{"skipNewLine"},
 	}
 }
 
@@ -111,8 +136,15 @@ func Style(text string, styleOptions ...StyleOption) string {
 		panic(err)
 	}
 
+	flags := map[string]struct{}{}
 	for _, styleOption := range styleOptions {
-		styleOption(result)
+		for _, flag := range styleOption.flags {
+			flags[flag] = struct{}{}
+		}
+
+		if styleOption.postProcess != nil {
+			styleOption.postProcess(result, flags)
+		}
 	}
 
 	return result.String()
