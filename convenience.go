@@ -71,7 +71,12 @@ func Substring(text string, start int, end int) string {
 func Bold() StyleOption {
 	return StyleOption{
 		postProcess: func(s *String, flags map[string]struct{}) {
+			_, skipNewLine := flags["skipNewLine"]
 			for i := range *s {
+				if skipNewLine && (*s)[i].Symbol == '\n' {
+					continue
+				}
+
 				(*s)[i].Settings |= 1 << 2
 			}
 		},
@@ -82,8 +87,29 @@ func Bold() StyleOption {
 func Italic() StyleOption {
 	return StyleOption{
 		postProcess: func(s *String, flags map[string]struct{}) {
+			_, skipNewLine := flags["skipNewLine"]
 			for i := range *s {
+				if skipNewLine && (*s)[i].Symbol == '\n' {
+					continue
+				}
+
 				(*s)[i].Settings |= 1 << 3
+			}
+		},
+	}
+}
+
+// Underline applies the underline text parameter
+func Underline() StyleOption {
+	return StyleOption{
+		postProcess: func(s *String, flags map[string]struct{}) {
+			_, skipNewLine := flags["skipNewLine"]
+			for i := range *s {
+				if skipNewLine && (*s)[i].Symbol == '\n' {
+					continue
+				}
+
+				(*s)[i].Settings |= 1 << 4
 			}
 		},
 	}
@@ -95,7 +121,6 @@ func Foreground(color colorful.Color) StyleOption {
 		postProcess: func(s *String, flags map[string]struct{}) {
 			r, g, b := color.RGB255()
 			_, skipNewLine := flags["skipNewLine"]
-
 			for i := range *s {
 				if skipNewLine && (*s)[i].Symbol == '\n' {
 					continue
