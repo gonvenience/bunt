@@ -119,12 +119,35 @@ func Underline() StyleOption {
 func Foreground(color colorful.Color) StyleOption {
 	return StyleOption{
 		postProcess: func(s *String, flags map[string]struct{}) {
-			r, g, b := color.RGB255()
 			_, skipNewLine := flags["skipNewLine"]
+			_, blendColors := flags["blendColors"]
+
 			for i := range *s {
 				if skipNewLine && (*s)[i].Symbol == '\n' {
 					continue
 				}
+
+				r, g, b := color.RGB255()
+
+				if blendColors && ((*s)[i].Settings>>8&0xFFFFFF) != 0 {
+					currentColor := colorful.Color{
+						R: float64(((*s)[i].Settings >> 8) & 0xFF),
+						G: float64(((*s)[i].Settings >> 16) & 0xFF),
+						B: float64(((*s)[i].Settings >> 24) & 0xFF),
+					}
+
+					targetColor := colorful.Color{
+						R: float64(r),
+						G: float64(g),
+						B: float64(b),
+					}
+
+					// reset RGB values with blended color values
+					r, g, b = targetColor.BlendLab(currentColor, 0.5).RGB255()
+				}
+
+				// reset currently set foreground color
+				(*s)[i].Settings &= 0xFFFFFFFF000000FF
 
 				(*s)[i].Settings |= 1
 				(*s)[i].Settings |= uint64(r) << 8
@@ -149,6 +172,14 @@ func EnableTextAnnotations() StyleOption {
 func EachLine() StyleOption {
 	return StyleOption{
 		flags: []string{"skipNewLine"},
+	}
+}
+
+// Blend enables that applying a color does not completely reset an existing
+// existing color, but rather mixes/blends both colors together.
+func Blend() StyleOption {
+	return StyleOption{
+		flags: []string{"blendColors"},
 	}
 }
 

@@ -44,6 +44,12 @@ var _ = Describe("convenience functions", func() {
 			expected := "\x1b[1mThis\x1b[0m text is too"
 			Expect(input).To(BeEquivalentTo(expected))
 		})
+
+		It("should panic in case string parsing inside Substring fails", func() {
+			Expect(func() {
+				Substring("\x1b[38;2;1;2mnot ok\x1b[0m", 0, 4)
+			}).To(Panic())
+		})
 	})
 
 	Context("text length function", func() {
@@ -123,6 +129,33 @@ var _ = Describe("convenience functions", func() {
 
 			Expect(Style("text\ntext", EachLine(), Underline())).To(
 				BeEquivalentTo("\x1b[4mtext\x1b[0m\n\x1b[4mtext\x1b[0m"))
+		})
+
+		It("should panic in case string parsing inside Style fails", func() {
+			Expect(func() {
+				Style("\x1b[38;2;1;2mnot ok\x1b[0m")
+			}).To(Panic())
+		})
+
+		It("should correctly apply a color to a string that already contains text emphasis", func() {
+			text := Sprintf("text with *bold* and _italic_.")
+			Expect(Style(text, Foreground(Orange))).To(
+				BeEquivalentTo("\x1b[38;2;255;165;0mtext with \x1b[1;38;2;255;165;0mbold\x1b[0;38;2;255;165;0m and \x1b[3;38;2;255;165;0mitalic\x1b[0;38;2;255;165;0m.\x1b[0m"),
+			)
+		})
+
+		It("should correctly apply a color to a string that already contains coloring", func() {
+			text := Sprintf("text with Green{colored parts}.")
+			Expect(Style(text, Foreground(Red))).To(
+				BeEquivalentTo("\x1b[38;2;255;0;0mtext with colored parts.\x1b[0m"),
+			)
+		})
+
+		It("should correctly blend a color to a string that already contains coloring", func() {
+			text := Sprintf("text with Lime{colored parts}.")
+			Expect(Style(text, Blend(), Foreground(Red))).To(
+				BeEquivalentTo("\x1b[38;2;255;0;0mtext with \x1b[38;2;144;175;18mcolored parts\x1b[38;2;255;0;0m.\x1b[0m"),
+			)
 		})
 	})
 })

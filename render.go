@@ -39,8 +39,18 @@ func (s String) String() string {
 	)
 
 	for _, coloredRune := range s {
-		if useColors && (coloredRune.Settings != current) {
-			buffer.WriteString(renderSelectGraphicRenditionEscapeSequence(coloredRune.Settings))
+		if useColors && (current != coloredRune.Settings) {
+			// In case text emphasis like bold, italic, or underline was set,
+			// but is now turned off, a reset sequence is in order to ensure
+			// that the text emphasis is removed.
+			prepend := []uint8{}
+			if isBitTurnedOff(current, coloredRune.Settings, boldMask) ||
+				isBitTurnedOff(current, coloredRune.Settings, italicMask) ||
+				isBitTurnedOff(current, coloredRune.Settings, underlineMask) {
+				prepend = append(prepend, 0)
+			}
+
+			buffer.WriteString(renderSGR(coloredRune.Settings, prepend...))
 			current = coloredRune.Settings
 		}
 
@@ -49,32 +59,37 @@ func (s String) String() string {
 
 	// Make sure to finish with a reset escape sequence
 	if current != 0 {
-		buffer.WriteString(renderSelectGraphicRenditionEscapeSequence(0))
+		buffer.WriteString(renderSGR(0))
 	}
 
 	return buffer.String()
 }
 
-func renderSelectGraphicRenditionEscapeSequence(setting uint64) string {
+func isBitTurnedOff(from uint64, to uint64, mask uint64) bool {
+	return (from&mask) != 0 && (to&mask) == 0
+}
+
+func renderSGR(setting uint64, prepend ...uint8) string {
 	if setting == 0 {
 		return renderEscapeSequence(0)
 	}
 
-	parameters := []uint8{}
+	// init parameters with provided additional parameters to be prepended
+	parameters := append([]uint8{}, prepend...)
 
-	if (setting & 0x04) != 0 {
+	if (setting & boldMask) != 0 {
 		parameters = append(parameters, 1)
 	}
 
-	if (setting & 0x08) != 0 {
+	if (setting & italicMask) != 0 {
 		parameters = append(parameters, 3)
 	}
 
-	if (setting & 0x10) != 0 {
+	if (setting & underlineMask) != 0 {
 		parameters = append(parameters, 4)
 	}
 
-	if (setting & 0x1) != 0 {
+	if (setting & fgMask) != 0 {
 		r, g, b := uint8((setting>>8)&0xFF), uint8((setting>>16)&0xFF), uint8((setting>>24)&0xFF)
 		if UseTrueColor() {
 			parameters = append(parameters, 38, 2, r, g, b)
@@ -84,7 +99,7 @@ func renderSelectGraphicRenditionEscapeSequence(setting uint64) string {
 		}
 	}
 
-	if (setting & 0x2) != 0 {
+	if (setting & bgMask) != 0 {
 		r, g, b := uint8((setting>>32)&0xFF), uint8((setting>>40)&0xFF), uint8((setting>>48)&0xFF)
 		if UseTrueColor() {
 			parameters = append(parameters, 48, 2, r, g, b)
