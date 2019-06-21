@@ -24,6 +24,15 @@ import (
 	"github.com/gonvenience/term"
 )
 
+// Internal bit mask to mark feature states, e.g. foreground coloring
+const (
+	fgMask        = 0x1
+	bgMask        = 0x2
+	boldMask      = 0x4
+	italicMask    = 0x8
+	underlineMask = 0x10
+)
+
 // ColorSetting defines the coloring setting to be used
 var ColorSetting = AUTO
 

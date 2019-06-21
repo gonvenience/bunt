@@ -109,20 +109,20 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 	for i := 0; i < len(values); i++ {
 		switch values[i] {
 		case 1: // bold
-			result |= 1 << 2
+			result |= boldMask
 
 		case 3: // italic
-			result |= 1 << 3
+			result |= italicMask
 
 		case 4: // underline
-			result |= 1 << 4
+			result |= underlineMask
 
 		case 38: // foreground color
 			if i+4 >= len(values) {
 				return 0, fmt.Errorf("insufficient data to parse RGB foreground color")
 			}
 
-			result |= 1 << 0
+			result |= fgMask
 			result |= uint64(values[i+2]) << 8
 			result |= uint64(values[i+3]) << 16
 			result |= uint64(values[i+4]) << 24
@@ -133,7 +133,7 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 				return 0, fmt.Errorf("insufficient data to parse RGB background color")
 			}
 
-			result |= 1 << 1
+			result |= bgMask
 			result |= uint64(values[i+2]) << 32
 			result |= uint64(values[i+3]) << 40
 			result |= uint64(values[i+4]) << 48
@@ -155,9 +155,9 @@ func processTextAnnotations(text *String) error {
 
 	// Process text annotation markers for bold, italic and underline
 	helperMap := map[uint64]*regexp.Regexp{
-		uint64(1 << 2): boldMarker,
-		uint64(1 << 3): italicMarker,
-		uint64(1 << 4): underlineMarker,
+		boldMask:      boldMarker,
+		italicMask:    italicMarker,
+		underlineMask: underlineMarker,
 	}
 
 	for mask, regex := range helperMap {
@@ -187,7 +187,7 @@ func processTextAnnotations(text *String) error {
 
 		r, g, b := color.RGB255()
 		for i := textStart; i < textEnd; i++ {
-			(*text)[i].Settings |= 1
+			(*text)[i].Settings |= fgMask
 			(*text)[i].Settings |= uint64(r) << 8
 			(*text)[i].Settings |= uint64(g) << 16
 			(*text)[i].Settings |= uint64(b) << 24
