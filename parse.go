@@ -62,7 +62,7 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 
 	// Special case: the escape sequence without any parameter is equivalent to
 	// the reset escape sequence.
-	input = strings.ReplaceAll(input, "\x1b[m", "\x1b[0m")
+	input = strings.Replace(input, "\x1b[m", "\x1b[0m", -1)
 
 	for _, submatch := range escapeSeqRegExp.FindAllStringSubmatchIndex(input, -1) {
 		fullMatchStart, fullMatchEnd := submatch[0], submatch[1]
