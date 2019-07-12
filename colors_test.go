@@ -223,4 +223,27 @@ var _ = Describe("color specific tests", func() {
 				BeEquivalentTo(Sprint("CornflowerBlue{CornflowerBlue}")))
 		})
 	})
+
+	Context("random colors", func() {
+		BeforeEach(func() {
+			ColorSetting = ON
+			TrueColorSetting = OFF
+		})
+
+		AfterEach(func() {
+			ColorSetting = AUTO
+			TrueColorSetting = AUTO
+		})
+
+		It("should create a list of random terminal friendly colors", func() {
+			colors := RandomTerminalFriendlyColors(16)
+			Expect(len(colors)).To(BeEquivalentTo(16))
+		})
+
+		It("should panic if negative number is given", func() {
+			Expect(func() {
+				RandomTerminalFriendlyColors(-1)
+			}).To(Panic())
+		})
+	})
 })

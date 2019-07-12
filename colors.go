@@ -21,6 +21,9 @@
 package bunt
 
 import (
+	"image/color"
+	"math"
+	"math/rand"
 	"strings"
 
 	colorful "github.com/lucasb-eyer/go-colorful"
@@ -343,4 +346,58 @@ func lookupColorByName(colorName string) *colorful.Color {
 
 	// Give up
 	return nil
+}
+
+// RandomTerminalFriendlyColors creates a list of random 24 bit colors based on
+// the 4 bit colors that most terminals support.
+func RandomTerminalFriendlyColors(n int) []colorful.Color {
+	if n < 0 {
+		panic("size is out of bounds, must be greater than zero")
+	}
+
+	f := func(i uint8) uint8 {
+		const threshold = 128
+		if i < threshold {
+			return i
+		}
+
+		maxFactor := .5
+		randomFactor := 1 + (rand.Float64()*2*maxFactor - maxFactor)
+
+		return uint8(math.Max(
+			math.Min(
+				randomFactor*float64(i),
+				255.0,
+			),
+			float64(threshold),
+		))
+	}
+
+	baseColors := [][]uint8{
+		{0xAA, 0x00, 0x00},
+		{0x00, 0xAA, 0x00},
+		{0xFF, 0xFF, 0x00},
+		{0x00, 0x00, 0xAA},
+		{0xAA, 0x00, 0xAA},
+		{0x00, 0xAA, 0xAA},
+		{0xAA, 0xAA, 0xAA},
+		{0xFF, 0x55, 0x55},
+		{0x55, 0xFF, 0x55},
+		{0xFF, 0xFF, 0x55},
+		{0x55, 0x55, 0xFF},
+		{0xFF, 0x55, 0xFF},
+		{0x55, 0xFF, 0xFF},
+		{0xFF, 0xFF, 0xFF},
+	}
+
+	result := make([]colorful.Color, n)
+	for i := 0; i < n; i++ {
+		baseColorRGB := baseColors[i%len(baseColors)]
+		r, g, b := baseColorRGB[0], baseColorRGB[1], baseColorRGB[2]
+
+		color, _ := colorful.MakeColor(color.RGBA{f(r), f(g), f(b), 0xFF})
+		result[i] = color
+	}
+
+	return result
 }
