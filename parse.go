@@ -34,7 +34,7 @@ var (
 	boldMarker      = regexp.MustCompile(`\*([^*]+?)\*`)
 	italicMarker    = regexp.MustCompile(`_([^_]+?)_`)
 	underlineMarker = regexp.MustCompile(`~([^~]+?)~`)
-	colorMarker     = regexp.MustCompile(`(\w+)\{([^}]+?)\}`)
+	colorMarker     = regexp.MustCompile(`(#?\w+)\{([^}]+?)\}`)
 )
 
 // ParseOption defines parser options

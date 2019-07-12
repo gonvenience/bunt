@@ -21,6 +21,8 @@
 package bunt
 
 import (
+	"strings"
+
 	colorful "github.com/lucasb-eyer/go-colorful"
 )
 
@@ -327,9 +329,18 @@ func hexColor(scol string) colorful.Color {
 }
 
 func lookupColorByName(colorName string) *colorful.Color {
+	// Try to lookup a color by a supplied hexcode
+	if strings.HasPrefix(colorName, "#") && len(colorName) == 7 {
+		if color, err := colorful.Hex(colorName); err == nil {
+			return &color
+		}
+	}
+
+	// Try to lookup color by searching in the known colors table
 	if color, ok := colorByNameMap[colorName]; ok {
 		return &color
 	}
 
+	// Give up
 	return nil
 }
