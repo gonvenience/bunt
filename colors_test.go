@@ -206,4 +206,21 @@ var _ = Describe("color specific tests", func() {
 			Expect(f1("WhiteSmoke")).To(BeEquivalentTo(f2(97)))           // WhiteSmoke matches BrightWhite (#97)
 		})
 	})
+
+	Context("custom colors in text annotation", func() {
+		BeforeEach(func() {
+			ColorSetting = ON
+			TrueColorSetting = ON
+		})
+
+		AfterEach(func() {
+			ColorSetting = AUTO
+			TrueColorSetting = AUTO
+		})
+
+		It("should parse hexcolors in text annotations", func() {
+			Expect(Sprint("#6495ED{CornflowerBlue}")).To(
+				BeEquivalentTo(Sprint("CornflowerBlue{CornflowerBlue}")))
+		})
+	})
 })
