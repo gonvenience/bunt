@@ -147,7 +147,7 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 func processTextAnnotations(text *String) error {
 	var buffer bytes.Buffer
 	for _, coloredRune := range *text {
-		buffer.WriteByte(byte(coloredRune.Symbol))
+		_ = buffer.WriteByte(byte(coloredRune.Symbol))
 	}
 
 	raw := buffer.String()
