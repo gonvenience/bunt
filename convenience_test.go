@@ -137,6 +137,12 @@ var _ = Describe("convenience functions", func() {
 			}).To(Panic())
 		})
 
+		It("should panic in case a non-existing color", func() {
+			Expect(func() {
+				Style("Foobar{test}", EnableTextAnnotations())
+			}).To(Panic())
+		})
+
 		It("should correctly apply a color to a string that already contains text emphasis", func() {
 			text := Sprintf("text with *bold* and _italic_.")
 			Expect(Style(text, Foreground(Orange))).To(

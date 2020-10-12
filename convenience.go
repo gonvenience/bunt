@@ -162,7 +162,9 @@ func Foreground(color colorful.Color) StyleOption {
 func EnableTextAnnotations() StyleOption {
 	return StyleOption{
 		postProcess: func(s *String, flags map[string]struct{}) {
-			processTextAnnotations(s)
+			if err := processTextAnnotations(s); err != nil {
+				panic(err)
+			}
 		},
 	}
 }
