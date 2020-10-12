@@ -21,6 +21,9 @@
 package bunt
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gonvenience/term"
 )
 
@@ -49,6 +52,23 @@ const (
 	AUTO = SwitchState(0)
 	ON   = SwitchState(+1)
 )
+
+// ParseSetting parses an input string to match for a supported setting
+func ParseSetting(setting string) (SwitchState, error) {
+	switch strings.ToLower(setting) {
+	case "auto":
+		return AUTO, nil
+
+	case "off", "no", "false":
+		return OFF, nil
+
+	case "on", "yes", "true":
+		return ON, nil
+
+	default:
+		return OFF, fmt.Errorf("invalid state '%s' used, supported modes are: auto, on, or off", setting)
+	}
+}
 
 // UseColors return whether colors are used or not based on the configured color
 // setting or terminal capabilities
