@@ -137,7 +137,7 @@ var _ = Describe("print functions", func() {
 		})
 	})
 
-	Context("weird use cases", func() {
+	Context("weird use cases and issues", func() {
 		BeforeEach(func() {
 			ColorSetting = ON
 		})
@@ -149,6 +149,12 @@ var _ = Describe("print functions", func() {
 		It("should ignore escape sequences that cannot be processed", func() {
 			Expect(Sprint("ok", "\x1b[38;2;1;2mnot ok\x1b[0m")).To(
 				BeEquivalentTo("ok\x1b[38;2;1;2mnot ok\x1b[0m"))
+		})
+		It("should not fail writing simple types", func() {
+			Expect(Sprint(42)).To(Equal("42"))
+		})
+		It("should not fail writing slices", func() {
+			Expect(Sprint([]int{42, 1})).To(Equal("[42 1]"))
 		})
 	})
 })
