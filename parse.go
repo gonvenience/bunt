@@ -68,8 +68,8 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 		fullMatchStart, fullMatchEnd := submatch[0], submatch[1]
 		settingsStart, settingsEnd := submatch[2], submatch[3]
 
-		for i := pointer; i < fullMatchStart; i++ {
-			result = append(result, ColoredRune{rune(input[i]), current})
+		for _, r := range input[pointer:fullMatchStart] {
+			result = append(result, ColoredRune{r, current})
 		}
 
 		current, err = parseSelectGraphicRenditionEscapeSequence(input[settingsStart:settingsEnd])
@@ -81,8 +81,8 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 	}
 
 	// Flush the remaining input string part into the result
-	for i := pointer; i < len(input); i++ {
-		result = append(result, ColoredRune{rune(input[i]), current})
+	for _, r := range input[pointer:] {
+		result = append(result, ColoredRune{r, current})
 	}
 
 	// Process optional parser options
