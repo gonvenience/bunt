@@ -56,7 +56,6 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 	var (
 		pointer int
 		current uint64
-		result  String
 		err     error
 	)
 
@@ -64,13 +63,34 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 	// the reset escape sequence.
 	input = strings.Replace(input, "\x1b[m", "\x1b[0m", -1)
 
+	// Ignore 'Set cursor key to application' sequence
+	input = strings.Replace(input, "\x1b[?1h", "", -1)
+
+	// Ignore keypad mode settings
+	input = strings.Replace(input, "\x1b=", "", -1)
+	input = strings.Replace(input, "\x1b>", "", -1)
+
+	// Ignore clear line from cursor right
+	input = strings.Replace(input, "\x1b[K", "", -1)
+
+	// Ignore known mode settings
+	input = regexp.MustCompile(`\x1b\[\?.+[lh]`).ReplaceAllString(input, "")
+
+	// Ignore this unknown sequence, which seems to be an conditional check
+	input = regexp.MustCompile(`\x1b\]11;\?.`).ReplaceAllString(input, "")
+
+	var result String
+	var applyToResult = func(str string, mask uint64) {
+		for _, r := range str {
+			result = append(result, ColoredRune{r, mask})
+		}
+	}
+
 	for _, submatch := range escapeSeqRegExp.FindAllStringSubmatchIndex(input, -1) {
 		fullMatchStart, fullMatchEnd := submatch[0], submatch[1]
 		settingsStart, settingsEnd := submatch[2], submatch[3]
 
-		for _, r := range input[pointer:fullMatchStart] {
-			result = append(result, ColoredRune{r, current})
-		}
+		applyToResult(input[pointer:fullMatchStart], current)
 
 		current, err = parseSelectGraphicRenditionEscapeSequence(input[settingsStart:settingsEnd])
 		if err != nil {
@@ -81,9 +101,7 @@ func ParseString(input string, opts ...ParseOption) (*String, error) {
 	}
 
 	// Flush the remaining input string part into the result
-	for _, r := range input[pointer:] {
-		result = append(result, ColoredRune{r, current})
-	}
+	applyToResult(input[pointer:], current)
 
 	// Process optional parser options
 	for _, opt := range opts {
