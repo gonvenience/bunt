@@ -21,6 +21,8 @@
 package bunt_test
 
 import (
+	"strings"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -36,6 +38,16 @@ var _ = Describe("parse input string", func() {
 	AfterEach(func() {
 		ColorSetting = AUTO
 		TrueColorSetting = AUTO
+	})
+
+	Context("parse supported ANSI sequences from an input reader", func() {
+		It("should parse an example command line input without errors", func() {
+			example := "Hallo\rHello, \x1b[1mWorld\x1b[0m!"
+
+			result, err := ParseStream(strings.NewReader(example))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.String()).To(Equal("Hello, \x1b[1mWorld\x1b[0m!"))
+		})
 	})
 
 	Context("parse Select Graphic Rendition (SGR) based input", func() {

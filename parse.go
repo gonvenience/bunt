@@ -21,8 +21,10 @@
 package bunt
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"regexp"
 	"sort"
 	"strconv"
@@ -46,6 +48,189 @@ func ProcessTextAnnotations() ParseOption {
 	return func(s *String) error {
 		return processTextAnnotations(s)
 	}
+}
+
+// ParseStream reads from the input reader and parses all supported ANSI
+// sequences that are relevant for colored strings.
+//
+// Please notes: This function is still under development and should replace
+// the `ParseString` function code eventually.
+func ParseStream(in io.Reader, opts ...ParseOption) (*String, error) {
+	var input *bufio.Reader
+	switch typed := in.(type) {
+	case *bufio.Reader:
+		input = typed
+
+	default:
+		input = bufio.NewReader(in)
+	}
+
+	type seq struct {
+		values string
+		suffix rune
+	}
+
+	var readSGR = func() seq {
+		var buf bytes.Buffer
+		for {
+			r, _, err := input.ReadRune()
+			if err == io.EOF {
+				break
+			}
+
+			switch r {
+			case 'h', 'l', 'm', 'r', 'A', 'B', 'C', 'D', 'H', 'f', 'g', 'K', 'J', 'y', 'q':
+				return seq{
+					values: buf.String(),
+					suffix: r,
+				}
+
+			default:
+				buf.WriteRune(r)
+			}
+		}
+
+		panic("failed to parse ANSI sequence")
+	}
+
+	var skipUntil = func(end rune) {
+		for {
+			r, _, err := input.ReadRune()
+			if err == io.EOF {
+				panic("reached end of file before reaching end identifier")
+			}
+
+			if r == end {
+				return
+			}
+		}
+	}
+
+	var result String
+	var line String
+	var lineIdx uint
+	var lineCap uint
+	var settings uint64
+
+	var readANSISeq = func() {
+		r, _, err := input.ReadRune()
+		if err == io.EOF {
+			return
+		}
+
+		// https://en.wikipedia.org/wiki/ANSI_escape_code#Escape_sequences
+		switch r {
+		case '[':
+			var seq = readSGR()
+			switch seq.suffix {
+			case 'm': // colors
+				settings, err = parseSelectGraphicRenditionEscapeSequence(seq.values)
+				if err != nil {
+					panic(err)
+				}
+
+			case 'K': // clear line
+				var start, end uint
+				switch seq.values {
+				case "", "0":
+					start, end = lineIdx, lineCap
+
+				case "1":
+					start, end = 0, lineIdx
+
+				case "2":
+					start, end = 0, lineCap
+				}
+
+				for i := start; i < end; i++ {
+					line[i].Symbol = ' '
+					line[i].Settings = 0
+				}
+
+			default:
+				// ignoring all other sequences
+			}
+
+		case ']':
+			skipUntil('\a')
+		}
+	}
+
+	var add = func(r rune) {
+		var cr = ColoredRune{Symbol: r, Settings: settings}
+
+		if lineIdx < lineCap {
+			line[lineIdx] = cr
+			lineIdx++
+
+		} else {
+			line = append(line, cr)
+			lineIdx++
+			lineCap++
+		}
+	}
+
+	var del = func() {
+		line = line[:len(line)-1]
+		lineIdx--
+		lineCap--
+	}
+
+	var flush = func() {
+		// Prepare to remove trailing spaces by finding the last non-space rune
+		var endIdx = len(line) - 1
+		for ; endIdx >= 0; endIdx-- {
+			if line[endIdx].Symbol != ' ' {
+				break
+			}
+		}
+
+		result = append(result, line[:endIdx+1]...)
+
+		line = String{}
+		lineIdx = 0
+		lineCap = 0
+	}
+
+	var newline = func() {
+		flush()
+		result = append(result, ColoredRune{Symbol: '\n'})
+	}
+
+	for {
+		r, _, err := input.ReadRune()
+		if err != nil && err == io.EOF {
+			break
+		}
+
+		switch r {
+		case '\x1b':
+			readANSISeq()
+
+		case '\r':
+			lineIdx = 0
+
+		case '\n':
+			newline()
+
+		case '\b':
+			del()
+
+		default:
+			add(r)
+		}
+	}
+
+	flush()
+
+	// Process optional parser options
+	for _, opt := range opts {
+		if err := opt(&result); err != nil {
+			return nil, err
+		}
+	}
+
+	return &result, nil
 }
 
 // ParseString parses a string that can contain both ANSI escape code Select
