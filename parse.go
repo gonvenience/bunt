@@ -136,97 +136,97 @@ func parseSelectGraphicRenditionEscapeSequence(escapeSeq string) (uint64, error)
 			result |= underlineMask
 
 		case 30: // Black
-			result |= fgRGBMask(0, 0, 0)
+			result |= fgRGBMask(1, 1, 1)
 
 		case 31: // Red
-			result |= fgRGBMask(170, 0, 0)
+			result |= fgRGBMask(222, 56, 43)
 
 		case 32: // Green
-			result |= fgRGBMask(0, 170, 0)
+			result |= fgRGBMask(57, 181, 74)
 
 		case 33: // Yellow
-			result |= fgRGBMask(229, 229, 16)
+			result |= fgRGBMask(255, 199, 6)
 
 		case 34: // Blue
-			result |= fgRGBMask(0, 0, 170)
+			result |= fgRGBMask(0, 111, 184)
 
 		case 35: // Magenta
-			result |= fgRGBMask(170, 0, 170)
+			result |= fgRGBMask(118, 38, 113)
 
 		case 36: // Cyan
-			result |= fgRGBMask(0, 170, 170)
+			result |= fgRGBMask(44, 181, 233)
 
 		case 37: // White
-			result |= fgRGBMask(229, 229, 229)
+			result |= fgRGBMask(204, 204, 204)
 
 		case 90: // Bright Black (Gray)
-			result |= fgRGBMask(85, 85, 85)
+			result |= fgRGBMask(128, 128, 128)
 
 		case 91: // Bright Red
-			result |= fgRGBMask(255, 85, 85)
+			result |= fgRGBMask(255, 0, 0)
 
 		case 92: // Bright Green
-			result |= fgRGBMask(85, 255, 85)
+			result |= fgRGBMask(0, 255, 0)
 
 		case 93: // Bright Yellow
-			result |= fgRGBMask(255, 255, 85)
+			result |= fgRGBMask(255, 255, 0)
 
 		case 94: // Bright Blue
-			result |= fgRGBMask(85, 85, 255)
+			result |= fgRGBMask(0, 0, 255)
 
 		case 95: // Bright Magenta
-			result |= fgRGBMask(255, 85, 255)
+			result |= fgRGBMask(255, 0, 255)
 
 		case 96: // Bright Cyan
-			result |= fgRGBMask(85, 255, 255)
+			result |= fgRGBMask(0, 255, 255)
 
 		case 97: // Bright White
 			result |= fgRGBMask(255, 255, 255)
 
 		case 40: // Black
-			result |= bgRGBMask(0, 0, 0)
+			result |= bgRGBMask(1, 1, 1)
 
 		case 41: // Red
-			result |= bgRGBMask(170, 0, 0)
+			result |= bgRGBMask(222, 56, 43)
 
 		case 42: // Green
-			result |= bgRGBMask(0, 170, 0)
+			result |= bgRGBMask(57, 181, 74)
 
 		case 43: // Yellow
-			result |= bgRGBMask(229, 229, 16)
+			result |= bgRGBMask(255, 199, 6)
 
 		case 44: // Blue
-			result |= bgRGBMask(0, 0, 170)
+			result |= bgRGBMask(0, 111, 184)
 
 		case 45: // Magenta
-			result |= bgRGBMask(170, 0, 170)
+			result |= bgRGBMask(118, 38, 113)
 
 		case 46: // Cyan
-			result |= bgRGBMask(0, 170, 170)
+			result |= bgRGBMask(44, 181, 233)
 
 		case 47: // White
-			result |= bgRGBMask(229, 229, 229)
+			result |= bgRGBMask(204, 204, 204)
 
 		case 100: // Bright Black (Gray)
-			result |= bgRGBMask(85, 85, 85)
+			result |= bgRGBMask(128, 128, 128)
 
 		case 101: // Bright Red
-			result |= bgRGBMask(255, 85, 85)
+			result |= bgRGBMask(255, 0, 0)
 
 		case 102: // Bright Green
-			result |= bgRGBMask(85, 255, 85)
+			result |= bgRGBMask(0, 255, 0)
 
 		case 103: // Bright Yellow
-			result |= bgRGBMask(255, 255, 85)
+			result |= bgRGBMask(255, 255, 0)
 
 		case 104: // Bright Blue
-			result |= bgRGBMask(85, 85, 255)
+			result |= bgRGBMask(0, 0, 255)
 
 		case 105: // Bright Magenta
-			result |= bgRGBMask(255, 85, 255)
+			result |= bgRGBMask(255, 0, 255)
 
 		case 106: // Bright Cyan
-			result |= bgRGBMask(85, 255, 255)
+			result |= bgRGBMask(0, 255, 255)
 
 		case 107: // Bright White
 			result |= bgRGBMask(255, 255, 255)
