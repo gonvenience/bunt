@@ -1,0 +1,24 @@
+---
+name: Release
+on:
+  push:
+    tags:
+      - "v*"
+  
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'custom tag'  
+
+jobs:
+  goreleaser:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Release notes generator
+        uses: Decathlon/release-notes-generator-action@v3.1.1
