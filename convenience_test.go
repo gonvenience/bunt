@@ -160,7 +160,7 @@ var _ = Describe("convenience functions", func() {
 		It("should correctly blend a color to a string that already contains coloring", func() {
 			text := Sprintf("text with Lime{colored parts}.")
 			Expect(Style(text, Blend(), Foreground(Red))).To(
-				BeEquivalentTo("\x1b[38;2;255;0;0mtext with \x1b[38;2;144;175;18mcolored parts\x1b[38;2;255;0;0m.\x1b[0m"),
+				BeEquivalentTo("\x1b[38;2;255;0;0mtext with \x1b[38;2;145;174;136mcolored parts\x1b[38;2;255;0;0m.\x1b[0m"),
 			)
 		})
 	})
