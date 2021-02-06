@@ -106,6 +106,15 @@ func ParseStream(in io.Reader, opts ...ParseOption) (*String, error) {
 		}
 	}
 
+	var asUint = func(s string) uint {
+		tmp, err := strconv.ParseUint(s, 10, 8)
+		if err != nil {
+			panic(err)
+		}
+
+		return uint(tmp)
+	}
+
 	var result String
 	var line String
 	var lineIdx uint
@@ -128,6 +137,14 @@ func ParseStream(in io.Reader, opts ...ParseOption) (*String, error) {
 				if err != nil {
 					panic(err)
 				}
+
+			case 'D': // move cursor left n lines
+				n := asUint(seq.values)
+				if n > lineIdx {
+					panic("move cursor value is out of bounds")
+				}
+
+				lineIdx -= n
 
 			case 'K': // clear line
 				var start, end uint

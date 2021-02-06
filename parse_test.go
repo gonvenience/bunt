@@ -48,6 +48,14 @@ var _ = Describe("parse input string", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal("Hello, \x1b[1mWorld\x1b[0m!"))
 		})
+
+		It("should parse escape sequences that move the cursor in the row", func() {
+			example := "Hallo\x1b[5DHello, \x1b[1mWorld\x1b[0m!"
+
+			result, err := ParseStream(strings.NewReader(example))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result.String()).To(Equal("Hello, \x1b[1mWorld\x1b[0m!"))
+		})
 	})
 
 	Context("parse Select Graphic Rendition (SGR) based input", func() {
