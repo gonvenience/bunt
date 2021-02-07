@@ -25,6 +25,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	. "github.com/gonvenience/bunt"
+
+	colorful "github.com/lucasb-eyer/go-colorful"
 )
 
 var _ = Describe("convenience functions", func() {

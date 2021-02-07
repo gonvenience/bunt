@@ -128,22 +128,10 @@ func Foreground(color colorful.Color) StyleOption {
 				}
 
 				r, g, b := color.RGB255()
-
-				if blendColors && ((*s)[i].Settings>>8&0xFFFFFF) != 0 {
-					currentColor := colorful.Color{
-						R: float64(((*s)[i].Settings >> 8) & 0xFF),
-						G: float64(((*s)[i].Settings >> 16) & 0xFF),
-						B: float64(((*s)[i].Settings >> 24) & 0xFF),
+				if blendColors {
+					if fgColor := ((*s)[i].Settings >> 8 & 0xFFFFFF); fgColor != 0 {
+						r, g, b = blend(r, g, b, fgColor)
 					}
-
-					targetColor := colorful.Color{
-						R: float64(r),
-						G: float64(g),
-						B: float64(b),
-					}
-
-					// reset RGB values with blended color values
-					r, g, b = targetColor.BlendLab(currentColor, 0.5).RGB255()
 				}
 
 				// reset currently set foreground color
@@ -237,4 +225,20 @@ func Style(text string, styleOptions ...StyleOption) string {
 	}
 
 	return result.String()
+}
+
+func blend(r, g, b uint8, currentColor uint64) (uint8, uint8, uint8) {
+	color1 := colorful.Color{
+		R: float64(r),
+		G: float64(g),
+		B: float64(b),
+	}
+
+	color2 := colorful.Color{
+		R: float64((currentColor >> 0) & 0xFF),
+		G: float64((currentColor >> 8) & 0xFF),
+		B: float64((currentColor >> 16) & 0xFF),
+	}
+
+	return color2.BlendLab(color1, 0.5).RGB255()
 }
