@@ -147,29 +147,35 @@ func Foreground(color colorful.Color) StyleOption {
 }
 
 // ForegroundFunc uses the provided function to set an individual foreground
-// color for each part of the text, based on the position in the text. The
-// function is given a float in the range between 0 and 1, normalized using the
-// longest row/line in the string. Each row is handled separately.
-func ForegroundFunc(f func(float64) colorful.Color) StyleOption {
+// color for each part of the text, which can be based on the position (x, y)
+// or the content (rune) in the text.
+func ForegroundFunc(f func(int, int, rune) *colorful.Color) StyleOption {
 	return StyleOption{
 		postProcess: func(s *String, flags map[string]struct{}) {
-			var maxLineLength = float64(s.lineLength())
+			_, blendColors := flags["blendColors"]
 
 			var x, y int
 			for i, c := range *s {
 				if c.Symbol == '\n' {
 					x = 0
 					y++
+					continue
 				}
 
-				color := f(float64(x) / maxLineLength)
-				r, g, b := color.RGB255()
+				if color := f(x, y, c.Symbol); color != nil {
+					r, g, b := color.RGB255()
+					if blendColors {
+						if fgColor := ((*s)[i].Settings >> 8 & 0xFFFFFF); fgColor != 0 {
+							r, g, b = blend(r, g, b, fgColor)
+						}
+					}
 
-				(*s)[i].Settings &= 0xFFFFFFFF000000FF
-				(*s)[i].Settings |= 1
-				(*s)[i].Settings |= uint64(r) << 8
-				(*s)[i].Settings |= uint64(g) << 16
-				(*s)[i].Settings |= uint64(b) << 24
+					(*s)[i].Settings &= 0xFFFFFFFF000000FF
+					(*s)[i].Settings |= 1
+					(*s)[i].Settings |= uint64(r) << 8
+					(*s)[i].Settings |= uint64(g) << 16
+					(*s)[i].Settings |= uint64(b) << 24
+				}
 
 				x++
 			}

@@ -20,11 +20,6 @@
 
 package bunt
 
-import (
-	"strings"
-	"unicode/utf8"
-)
-
 // String is a string with color information
 type String []ColoredRune
 
@@ -49,26 +44,4 @@ type ColoredRune struct {
 // and end indicies.
 func (s *String) Substring(from, to int) {
 	*s = (*s)[from:to]
-}
-
-func (s *String) rawString() string {
-	var runes = make([]rune, len(*s))
-	for i, c := range *s {
-		runes[i] = c.Symbol
-	}
-
-	return string(runes)
-}
-
-func (s *String) lineLength() int {
-	var lines = strings.Split(s.rawString(), "\n")
-	var max = 0
-
-	for _, line := range lines {
-		if len := utf8.RuneCountInString(line); len > max {
-			max = len
-		}
-	}
-
-	return max
 }

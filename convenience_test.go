@@ -165,5 +165,54 @@ var _ = Describe("convenience functions", func() {
 				BeEquivalentTo("\x1b[38;2;255;0;0mtext with \x1b[38;2;145;174;136mcolored parts\x1b[38;2;255;0;0m.\x1b[0m"),
 			)
 		})
+
+		It("should set a conditional foreground color based on the respective content", func() {
+			Expect(Style(
+				"foobar\nfOObAr",
+				ForegroundFunc(func(_, _ int, r rune) *colorful.Color {
+					switch r {
+					case 'o':
+						return &Green
+
+					case 'a':
+						return &Red
+					}
+
+					return nil
+				})),
+			).To(Equal("f\x1b[38;2;0;128;0moo\x1b[0mb\x1b[38;2;255;0;0ma\x1b[0mr\nfOObAr"))
+		})
+
+		It("should set a conditional foreground color based on the position in the content", func() {
+			Expect(Style(
+				"foobar\nfOObAr",
+				ForegroundFunc(func(x, _ int, _ rune) *colorful.Color {
+					switch x {
+					case 1, 2:
+						return &Green
+
+					case 4:
+						return &Red
+					}
+
+					return nil
+				})),
+			).To(Equal("f\x1b[38;2;0;128;0moo\x1b[0mb\x1b[38;2;255;0;0ma\x1b[0mr\nf\x1b[38;2;0;128;0mOO\x1b[0mb\x1b[38;2;255;0;0mA\x1b[0mr"))
+		})
+
+		It("should set a conditional foreground color by blending it with the current color", func() {
+			Expect(Style(
+				Sprintf("Lime{foobar}"),
+				Blend(),
+				ForegroundFunc(func(_, _ int, r rune) *colorful.Color {
+					switch r {
+					case 'o':
+						return &Red
+					}
+
+					return nil
+				})),
+			).To(Equal("\x1b[38;2;0;255;0mf\x1b[38;2;145;174;136moo\x1b[38;2;0;255;0mbar\x1b[0m"))
+		})
 	})
 })
