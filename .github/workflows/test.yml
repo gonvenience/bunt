@@ -8,7 +8,6 @@ on:
     branches: [ main ]
 
 jobs:
-
   build:
     name: Build
     runs-on: ubuntu-latest
@@ -27,6 +26,19 @@ jobs:
 
     - name: Test
       run: |
-        go get github.com/onsi/ginkgo/ginkgo
-        go get github.com/onsi/gomega/...
+        go vet ./...
+
+        go get github.com/gordonklaus/ineffassign
+        ineffassign ./...
+        
+        go get golang.org/x/lint/golint
+        golint ./...
+        
+        go get github.com/client9/misspell/cmd/misspell
+        find . -type f | xargs misspell -source=text -error
+        
+        go get honnef.co/go/tools/cmd/staticcheck
+        staticcheck ./...
+        
+        go get github.com/onsi/ginkgo/ginkgo github.com/onsi/gomega/...
         ginkgo -r -randomizeAllSpecs -randomizeSuites -failOnPending -nodes=1 -compilers=1 -race -trace -cover
