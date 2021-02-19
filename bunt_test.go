@@ -28,27 +28,33 @@ import (
 )
 
 var _ = Describe("settings tests", func() {
+	var parse = func(setting string) (string, error) {
+		tmp := AUTO
+		err := tmp.Set(setting)
+		return tmp.String(), err
+	}
+
 	Context("parse color settings", func() {
 		It("should parse auto as setting auto", func() {
-			setting, err := ParseSetting("auto")
+			setting, err := parse("auto")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(setting).To(Equal(AUTO))
+			Expect(setting).To(Equal(AUTO.String()))
 		})
 
 		It("should parse off as setting off", func() {
-			setting, err := ParseSetting("off")
+			setting, err := parse("off")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(setting).To(Equal(OFF))
+			Expect(setting).To(Equal(OFF.String()))
 		})
 
 		It("should parse on as setting on", func() {
-			setting, err := ParseSetting("on")
+			setting, err := parse("on")
 			Expect(err).ToNot(HaveOccurred())
-			Expect(setting).To(Equal(ON))
+			Expect(setting).To(Equal(ON.String()))
 		})
 
 		It("should fail to parse unknown setting", func() {
-			_, err := ParseSetting("foo")
+			_, err := parse("foo")
 			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(BeEquivalentTo("invalid state 'foo' used, supported modes are: auto, on, or off"))
 		})

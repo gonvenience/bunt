@@ -42,32 +42,51 @@ var ColorSetting = AUTO
 // TrueColorSetting defines the true color usage setting to be used
 var TrueColorSetting = AUTO
 
-// SwitchState is the type to cover different preferences/settings like:
-// on, off, or auto
-type SwitchState int
+// switchState is the type to cover different preferences/settings like: on, off, or auto
+type switchState int
 
 // Supported setting states
 const (
-	OFF  = SwitchState(-1)
-	AUTO = SwitchState(0)
-	ON   = SwitchState(+1)
+	ON = switchState(iota)
+	OFF
+	AUTO
 )
 
-// ParseSetting parses an input string to match for a supported setting
-func ParseSetting(setting string) (SwitchState, error) {
+func (s switchState) String() string {
+	switch s {
+	case ON:
+		return "on"
+
+	case OFF:
+		return "off"
+
+	case AUTO:
+		return "auto"
+	}
+
+	panic("unsupported switch state")
+}
+
+func (s *switchState) Set(setting string) error {
 	switch strings.ToLower(setting) {
 	case "auto":
-		return AUTO, nil
+		*s = AUTO
 
 	case "off", "no", "false":
-		return OFF, nil
+		*s = OFF
 
 	case "on", "yes", "true":
-		return ON, nil
+		*s = ON
 
 	default:
-		return OFF, fmt.Errorf("invalid state '%s' used, supported modes are: auto, on, or off", setting)
+		return fmt.Errorf("invalid state '%s' used, supported modes are: auto, on, or off", setting)
 	}
+
+	return nil
+}
+
+func (s switchState) Type() string {
+	return ""
 }
 
 // UseColors return whether colors are used or not based on the configured color
