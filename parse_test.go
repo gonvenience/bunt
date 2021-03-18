@@ -31,13 +31,11 @@ import (
 
 var _ = Describe("parse input string", func() {
 	BeforeEach(func() {
-		ColorSetting = ON
-		TrueColorSetting = ON
+		SetColorSettings(ON, ON)
 	})
 
 	AfterEach(func() {
-		ColorSetting = AUTO
-		TrueColorSetting = AUTO
+		SetColorSettings(AUTO, AUTO)
 	})
 
 	Context("parse supported ANSI sequences from an input reader", func() {

@@ -32,13 +32,11 @@ import (
 var _ = Describe("color specific tests", func() {
 	Context("fallback to 4 bit colors for non true color terminals", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
-			TrueColorSetting = OFF
+			SetColorSettings(ON, OFF)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
-			TrueColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		var (
@@ -209,13 +207,11 @@ var _ = Describe("color specific tests", func() {
 
 	Context("custom colors in text annotation", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
-			TrueColorSetting = ON
+			SetColorSettings(ON, ON)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
-			TrueColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should parse hexcolors in text annotations", func() {
@@ -226,13 +222,11 @@ var _ = Describe("color specific tests", func() {
 
 	Context("random colors", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
-			TrueColorSetting = OFF
+			SetColorSettings(ON, OFF)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
-			TrueColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should create a list of random terminal friendly colors", func() {

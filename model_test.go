@@ -30,11 +30,11 @@ import (
 var _ = Describe("working with colored strings", func() {
 	Context("cut a substring from a colored string", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, OFF)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should be possible to cut out a substring from a colored string", func() {

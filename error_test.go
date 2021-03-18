@@ -30,11 +30,11 @@ import (
 var _ = Describe("error functions", func() {
 	Context("process markdown style in Errorf function", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, OFF)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should parse and process markdown style in Errorf", func() {

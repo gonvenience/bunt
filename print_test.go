@@ -54,11 +54,11 @@ var _ = Describe("print functions", func() {
 		}
 
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, AUTO)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should parse and process markdown style in Print", func() {
@@ -87,13 +87,15 @@ var _ = Describe("print functions", func() {
 		)
 
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, AUTO)
 			buf = bytes.Buffer{}
 			out = bufio.NewWriter(&buf)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			buf.Reset()
+			out = nil
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should parse and process markdown style in Fprint", func() {
@@ -117,11 +119,11 @@ var _ = Describe("print functions", func() {
 
 	Context("process markdown style in Sprint functions", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, AUTO)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should parse and process markdown style in Sprint", func() {
@@ -139,11 +141,11 @@ var _ = Describe("print functions", func() {
 
 	Context("weird use cases and issues", func() {
 		BeforeEach(func() {
-			ColorSetting = ON
+			SetColorSettings(ON, AUTO)
 		})
 
 		AfterEach(func() {
-			ColorSetting = AUTO
+			SetColorSettings(AUTO, AUTO)
 		})
 
 		It("should ignore escape sequences that cannot be processed", func() {

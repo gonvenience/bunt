@@ -31,13 +31,11 @@ import (
 
 var _ = Describe("convenience functions", func() {
 	BeforeEach(func() {
-		ColorSetting = ON
-		TrueColorSetting = ON
+		SetColorSettings(ON, ON)
 	})
 
 	AfterEach(func() {
-		ColorSetting = AUTO
-		TrueColorSetting = AUTO
+		SetColorSettings(AUTO, AUTO)
 	})
 
 	Context("substring function", func() {

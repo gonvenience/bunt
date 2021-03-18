@@ -29,7 +29,7 @@ import (
 
 var _ = Describe("settings tests", func() {
 	var parse = func(setting string) (string, error) {
-		tmp := AUTO
+		var tmp = &SwitchState{}
 		err := tmp.Set(setting)
 		return tmp.String(), err
 	}
