@@ -7,5 +7,5 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mattn/go-ciede2000 v0.0.0-20170301095244-782e8c62fec3
 	github.com/onsi/ginkgo v1.16.4
-	github.com/onsi/gomega v1.15.0
+	github.com/onsi/gomega v1.17.0
 )
