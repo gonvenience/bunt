@@ -48,7 +48,8 @@ var _ = Describe("print functions", func() {
 			w.Close()
 
 			var buf bytes.Buffer
-			io.Copy(&buf, r)
+			_, err = io.Copy(&buf, r)
+			Expect(err).ToNot(HaveOccurred())
 
 			return buf.String()
 		}
@@ -63,19 +64,19 @@ var _ = Describe("print functions", func() {
 
 		It("should parse and process markdown style in Print", func() {
 			Expect(captureStdout(func() {
-				Print("This should be *bold*.")
+				_, _ = Print("This should be *bold*.")
 			})).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m."))
 		})
 
 		It("should parse and process markdown style in Printf", func() {
 			Expect(captureStdout(func() {
-				Printf("This should be *%s*.", "bold")
+				_, _ = Printf("This should be *%s*.", "bold")
 			})).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m."))
 		})
 
 		It("should parse and process markdown style in Println", func() {
 			Expect(captureStdout(func() {
-				Println("This should be *bold*.")
+				_, _ = Println("This should be *bold*.")
 			})).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m.\n"))
 		})
 	})
@@ -99,19 +100,19 @@ var _ = Describe("print functions", func() {
 		})
 
 		It("should parse and process markdown style in Fprint", func() {
-			Fprint(out, "This should be *bold*.")
+			_, _ = Fprint(out, "This should be *bold*.")
 			out.Flush()
 			Expect(buf.String()).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m."))
 		})
 
 		It("should parse and process markdown style in Fprintf", func() {
-			Fprintf(out, "This should be *%s*.", "bold")
+			_, _ = Fprintf(out, "This should be *%s*.", "bold")
 			out.Flush()
 			Expect(buf.String()).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m."))
 		})
 
 		It("should parse and process markdown style in Fprintln", func() {
-			Fprintln(out, "This should be *bold*.")
+			_, _ = Fprintln(out, "This should be *bold*.")
 			out.Flush()
 			Expect(buf.String()).To(BeEquivalentTo("This should be \x1b[1mbold\x1b[0m.\n"))
 		})
