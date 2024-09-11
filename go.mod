@@ -1,6 +1,6 @@
 module github.com/gonvenience/bunt
 
-go 1.20
+go 1.22.0
 
 require (
 	github.com/gonvenience/term v1.0.2
