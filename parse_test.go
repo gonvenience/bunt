@@ -54,6 +54,18 @@ var _ = Describe("parse input string", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result.String()).To(Equal("Hello, \x1b[1mWorld\x1b[0m!"))
 		})
+
+		It("should process Operating System Command sequences that terminate on bell", func() {
+			result, err := ParseStream(strings.NewReader("\x1b]2;title\a"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeNil())
+		})
+
+		It("should process Operating System Command sequences that terminate string terminator", func() {
+			result, err := ParseStream(strings.NewReader("\x1b]7;file://host/home/foobar/dir\x1b\\"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(result).ToNot(BeNil())
+		})
 	})
 
 	Context("parse Select Graphic Rendition (SGR) based input", func() {
