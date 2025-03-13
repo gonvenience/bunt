@@ -3,7 +3,7 @@ module github.com/gonvenience/bunt
 go 1.22.0
 
 require (
-	github.com/gonvenience/term v1.0.2
+	github.com/gonvenience/term v1.0.3
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/mattn/go-ciede2000 v0.0.0-20170301095244-782e8c62fec3
 	github.com/mattn/go-isatty v0.0.20
@@ -12,7 +12,6 @@ require (
 )
 
 require (
-	github.com/fsnotify/fsnotify v1.8.0 // indirect
 	github.com/go-logr/logr v1.4.2 // indirect
 	github.com/go-task/slim-sprig/v3 v3.0.0 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
