@@ -2,8 +2,6 @@ module github.com/gonvenience/bunt
 
 go 1.23.0
 
-toolchain go1.24.1
-
 require (
 	github.com/gonvenience/term v1.0.4
 	github.com/lucasb-eyer/go-colorful v1.2.0
