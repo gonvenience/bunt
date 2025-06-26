@@ -66,6 +66,16 @@ var _ = Describe("parse input string", func() {
 			Expect(err).ToNot(HaveOccurred())
 			Expect(result).ToNot(BeNil())
 		})
+
+		It("should process complementing sequences without overriding a previous setting, i.e. setting fore- and background color", func() {
+			result, err := ParseStream(strings.NewReader("\x1b[46m\x1b[30mX\x1b[0m"))
+			Expect(err).ToNot(HaveOccurred())
+			Expect(*result).To(Equal(String(
+				[]ColoredRune{
+					{'X', 0x00E9B52C01010103},
+				},
+			)))
+		})
 	})
 
 	Context("parse Select Graphic Rendition (SGR) based input", func() {
