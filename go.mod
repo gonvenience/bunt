@@ -18,7 +18,7 @@ require (
 	github.com/google/pprof v0.0.0-20250403155104-27863c87afa6 // indirect
 	github.com/mitchellh/go-ps v1.0.0 // indirect
 	go.uber.org/automaxprocs v1.6.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/net v0.42.0 // indirect
 	golang.org/x/sys v0.34.0 // indirect
 	golang.org/x/term v0.33.0 // indirect
 	golang.org/x/text v0.27.0 // indirect
