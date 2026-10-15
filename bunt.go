@@ -129,6 +129,20 @@ func UseColors() bool {
 		return false
 	}
 
+	// FORCE_COLOR takes precedence over NO_COLOR
+	if v, ok := os.LookupEnv("FORCE_COLOR"); ok && v != "" {
+		if v != "0" && v != "false" {
+			return true
+		}
+	}
+
+	// Check NO_COLOR
+	if v, ok := os.LookupEnv("NO_COLOR"); ok && v != "" {
+		if v != "0" && v != "false" {
+			return false
+		}
+	}
+
 	// Windows in non Cygwin environments is (currently) not supported
 	if runtime.GOOS == "windows" && !isatty.IsCygwinTerminal(os.Stdout.Fd()) {
 		return false
